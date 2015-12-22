@@ -1,0 +1,413 @@
+Toggle navigation One Month | Rails
+
+<https://onemonth.com/courses/one-month-rails>
+
+  * Dashboard
+
+    <https://onemonth.com/courses>
+  * Course Progress
+
+    <https://onemonth.com/courses/one-month-rails>
+  * Forum
+
+    <https://onemonth.com/community>
+  * |
+
+  * Hi, sergio Missing
+
+    <#>
+      o Upgrade Now!
+
+        <https://onemonth.com/subscription/change>
+      o Manage Account
+
+        <https://onemonth.com/users/edit>
+      o Sign out
+
+        <https://onemonth.com/signout>
+
+0:00
+ 
+ 
+ 
+ 
+ 
+POWERED BY WISTIA
+
+<http://wistia.com/about-wistia?player=88855>
+Loading...
+Playing in 720p
+● Auto
+○ 360p
+○ 720p
+Switch to Flash
+About Wistia
+
+<http://wistia.com/about-wistia?about=88855>
+CC
+Off
+English
+
+  * //
+
+    <#>
+  * Speed 1.25x
+
+    <#>
+      o Drunk Mode
+
+        <#>
+      o 0.75x
+
+        <#>
+      o 1x
+
+        <#>
+      o //1.25x
+
+        <#>
+      o 1.5x
+
+        <#>
+      o 2x
+
+        <#>
+  * //
+
+    <#>
+
+
+  Image Upload with Paperclip
+
+Day 24 · Lesson 2
+
+  * Lesson Notes
+
+    <#step-notes>
+  * Troubleshooting
+
+    <#troubleshooting>
+  * 30 Questions
+
+    <#comments>
+  *
+    Complete & Continue
+
+
+Paperclip is a gem that allows you to upload images
+
+
+      1. Install the paperclip gem // <#>
+
+https://github.com/thoughtbot/paperclip
+
+//Gemfile/
+
+|gem 'paperclip', '~> 4.2'|
+
+Then run:
+
+|$ bundle install |
+
+//app/models/pin.rb/
+
+|class Pin < ActiveRecord::Base
+     belongs_to :user
+     has_attached_file :image, :styles => { :medium => "300x300>", :thumb => "100x100>" }
+end|
+
+
+      2. Generate a paperclip migration // <#>
+
+|$ rails generate paperclip pin image|
+
+Run and check the migration
+
+|$ rake db:migrate 
+$ rake db:migrate:status|
+
+
+      3. Restart your server after adding a gem file // <#>
+
+|$ ^C
+$ rails server|
+
+
+      4. Edit the pin form // <#>
+
+//app/views/pins/_form.html.erb/
+
+|<%= form_for @pin, html: { multipart: true } do |f| %>
+.
+.
+.
+  <div class="form-group">
+    <%= f.label :image %>
+    <%= f.file_field :image, class: "form-control" %>
+  </div>
+.
+.
+.|
+
+
+      5. Update the Pins Controller for strong parameters // <#>
+
+//app/controllers/concerns/pins_controller.rb/
+
+|.
+.
+.
+    def pin_params
+      params.require(:pin).permit(:description, :image)
+    end
+.
+.
+.|
+
+
+      6. Update the pins show view // <#>
+
+//app/views/pins/show.html.erb/
+
+|<%= image_tag @pin.image.url %>
+.
+.
+.|
+
+
+      7. Update the pins index // <#>
+
+//app/views/pins/index.html.erb/
+
+|<h1>Listing pins</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Image</th>
+      <th>Description</th>
+      <th>User</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @pins.each do |pin| %>
+      <tr>
+        <td><%= image_tag pin.image.url(:medium) %></td>
+        <td><%= pin.description %></td>
+        <td><%= pin.user.email if pin.user %></td>
+        <td><%= link_to 'Show', pin_path(pin) %></td>
+        <% if pin.user == current_user %>
+          <td><%= link_to 'Edit', edit_pin_path(pin) %></td>
+          <td><%= link_to 'Destroy', pin, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+<% if user_signed_in? %>
+  <%= link_to 'New Pin', new_pin_path %>
+<% end %>|
+
+
+      8. Delete pins made by non users // <#>
+
+|$ rails console
+$ Pin.first
+$ pin = Pin.first
+$ pin.destroy
+$ Pin.first.destroy|
+
+
+      9. Update the pins show view for image size // <#>
+
+//app/views/pins/show.html.erb/
+
+|<%= image_tag @pin.image.url(:medium) %>
+.
+.
+.|
+
+
+      10. Commit changes // <#>
+
+|$ rails console
+$ git add .
+$ git commit -am "Add image upload with Paperclip"
+$ git push
+$ git config --global push.default matching|
+
+
+      Q: Is $ rails generate paperclip pin image failing?
+
+There is an issue on github
+<https://github.com/thoughtbot/paperclip/issues/1495> that outlines the
+problem.
+
+the fix is to update your gem to use
+
+gem 'paperclip', github: 'thoughtbot/paperclip'
+
+After you do this, you can run "bundle update" and you should be able to
+continue with the lesson.
+
+
+      Q: Are you seeing Paperclip::Errors::NotIdentifiedByImageMagickError?
+
+You need to follow the steps outlined
+under https://github.com/thoughtbot/paperclip#image-processor to add the
+appropriate path to development.rb
+
+
+      Q:  Are you seeing "has an extension that does not match its
+      contents"?
+
+This is a Windows specific issue that paperclip devs are working to
+resolve. Look in the config/initializers directory, and edit the file,
+called mine_types.rb by adding in the code below:
+
+module Paperclip 
+  class MediaTypeSpoofDetector 
+    def spoofed? 
+      false 
+    end 
+  end 
+end
+
+See more
+at http://stackoverflow.com/questions/23460108/cannot-save-image-by-paperclip-in-rails-on-windows-8
+
+
+      Q:  Are you seeing Paperclip::Errors::MissingRequiredValidatorError ?
+
+You'll need to add the following to your Pins model:
+
+validates_attachment_content_type :image, :content_type => ["image/jpg", "image/jpeg", "image/png"]
+
+
+      30 Questions
+
+Having trouble? Don't worry, you're probably not the only one. Check out
+the questions other students have or ask yours.
+
+Day 24 - I can't upload image pins using paperclip, please help!
+<http://community.onemonth.com/t/day-24-i-cant-upload-image-pins-using-paperclip-please-help>
+
+I run "$ identify" and i get "sh.exe": identify: command not found"
+<http://community.onemonth.com/t/i-run-identify-and-i-get-sh-exe-identify-command-not-found>
+
+Installing ImageMagick - PC Windows 7. Day 24, Generate a paperclip
+migration (rails generate paperclip pin image). I get a weird message on
+my screen. ImageMagick - Windows
+<http://community.onemonth.com/t/installing-imagemagick-pc-windows-7-day-24-generate-a-paperclip-migration-rails-generate-paperclip-pin-image-i-get-a-weird-message-on-my-screen-imagemagick-windows>
+
+CommandNotFoundError in PinsController#create
+<http://community.onemonth.com/t/commandnotfounderror-in-pinscontroller-create>
+
+Could not run the `identify` command. Please install ImageMagick
+<http://community.onemonth.com/t/could-not-run-the-identify-command-please-install-imagemagick>
+
+Error: ActiveRecord::RecordNotFound in PinsController#destroy
+<http://community.onemonth.com/t/error-activerecord-recordnotfound-in-pinscontroller-destroy>
+
+CLIENT: 1.4.1, SERVER: 1.4.0 - Need Help To Fix
+<http://community.onemonth.com/t/client-1-4-1-server-1-4-0-need-help-to-fix>
+
+Params for uploading image
+<http://community.onemonth.com/t/params-for-uploading-image>
+
+Paperclip Image Upload throws "Image has contents that are not what they
+are reported to be" error
+<http://community.onemonth.com/t/paperclip-image-upload-throws-image-has-contents-that-are-not-what-they-are-reported-to-be-error>
+
+ActionController::RoutingError (No route matches [GET]
+"/images/medium/missing.png"
+<http://community.onemonth.com/t/actioncontroller-routingerror-no-route-matches-get-images-medium-missing-png>
+
+What is the path for the pins Index page
+<http://community.onemonth.com/t/what-is-the-path-for-the-pins-index-page>
+
+Adding videos with Paperclip
+<http://community.onemonth.com/t/adding-videos-with-paperclip>
+
+Can't upload some files for some ANNOYING reason
+<http://community.onemonth.com/t/cant-upload-some-files-for-some-annoying-reason>
+
+Preventing paperclip uploads from getting pushed to github
+<http://community.onemonth.com/t/preventing-paperclip-uploads-from-getting-pushed-to-github>
+
+Error when posting image to Pin
+<http://community.onemonth.com/t/error-when-posting-image-to-pin>
+
+Problems with Images <http://community.onemonth.com/t/problems-with-images>
+
+' The action 'destroy' could not be found for PinsController'
+<http://community.onemonth.com/t/the-action-destroy-could-not-be-found-for-pinscontroller>
+
+What to do for this? Could not run the `identify` command. Please
+install ImageMagick
+<http://community.onemonth.com/t/what-to-do-for-this-could-not-run-the-identify-command-please-install-imagemagick>
+
+Syntax Error with "html: {multipart: true}" in _form.html.erb
+<http://community.onemonth.com/t/syntax-error-with-html-multipart-true-in--form-html-erb>
+
+Have a problem with my images
+<http://community.onemonth.com/t/have-a-problem-with-my-images>
+
+Pare clip gem ins't found
+<http://community.onemonth.com/t/pare-clip-gem-inst-found>
+
+Undefined method `image' for nil:NilClass
+<http://community.onemonth.com/t/undefined-method-image-for-nil-nilclass>
+
+Bad file Number on day 24!
+<http://community.onemonth.com/t/bad-file-number-on-day-24>
+
+Paperclip Errors <http://community.onemonth.com/t/paperclip-errors>
+
+Could not find generator 'paperclip'
+<http://community.onemonth.com/t/could-not-find-generator-paperclip>
+
+Missing Required Validator Error in Pins Controller
+<http://community.onemonth.com/t/missing-required-validator-error-in-pins-controller>
+
+Undefined method `has_attached_file' for PinsController:Class
+<http://community.onemonth.com/t/undefined-method-has-attached-file-for-pinscontroller-class>
+
+Infinite loading when attempting to add images
+<http://community.onemonth.com/t/infinite-loading-when-attempting-to-add-images>
+
+Getting an Error when attempting to create new pin
+<http://community.onemonth.com/t/getting-an-error-when-attempting-to-create-new-pin>
+
+Images not showing following adding Paperclip gem-Day 24 lesson 2
+<http://community.onemonth.com/t/images-not-showing-following-adding-paperclip-gem-day-24-lesson-2>
+
+Ask A Question <http://community.onemonth.com/category/rails/day-24/create>
+
+Dark logo @2x
+
+<https://onemonth.com/>
+
+|  Building a better way to learn.
+
+  * Careers
+
+    <http://jobs.onemonth.com/>
+  * GoRails Screencasts
+
+    <https://gorails.com/>
+  * Terms & Conditions
+
+    <https://onemonth.com/terms-of-use>
+  * Privacy Policy
+
+    <https://www.iubenda.com/privacy-policy/735465>
+
+© 2013-2015 One Month, Inc.
+
