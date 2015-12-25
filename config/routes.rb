@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   resources :pins
 
   devise_for :users
-  root'page#home'
+  root'pins#index'
   
 
   # The priority is based upon order of creation: first created -> highest priority.
