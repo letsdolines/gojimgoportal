@@ -10,6 +10,8 @@ gem 'devise', '~> 3.5'
 gem 'paperclip', github: 'thoughtbot/paperclip'
 gem 'aws-sdk'
 gem 'masonry-rails'
+gem "will_paginate"
+gem "will_paginate-bootstrap"
 
 gem 'tzinfo-data', platforms: [:mingw, :mswin]
 

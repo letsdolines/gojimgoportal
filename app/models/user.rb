@@ -8,4 +8,5 @@ class User < ActiveRecord::Base
                      :format => {:with => /\A.*(?=.{10,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\@\#\$\%\^\&\+\=]).*\Z/ }
   has_many :pins
 
+  validates	:name, presence: true
 end
